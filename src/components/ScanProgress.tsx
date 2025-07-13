@@ -8,18 +8,18 @@ interface ScanProgressProps {
 
 const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
   const scanSteps = [
-    { icon: <Zap className="w-6 h-6" />, label: 'INITIALIZING', color: 'text-cyber-blue' },
-    { icon: <Search className="w-6 h-6" />, label: 'SCANNING', color: 'text-cyber-yellow' },
-    { icon: <Shield className="w-6 h-6" />, label: 'ANALYZING', color: 'text-cyber-purple' },
-    { icon: <CheckCircle className="w-6 h-6" />, label: 'COMPLETING', color: 'text-cyber-green' }
+    { icon: <Zap className="w-5 h-5 sm:w-6 sm:h-6" />, label: 'INITIALIZING', color: 'text-cyber-blue' },
+    { icon: <Search className="w-5 h-5 sm:w-6 sm:h-6" />, label: 'SCANNING', color: 'text-cyber-yellow' },
+    { icon: <Shield className="w-5 h-5 sm:w-6 sm:h-6" />, label: 'ANALYZING', color: 'text-cyber-purple' },
+    { icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />, label: 'COMPLETING', color: 'text-cyber-green' }
   ];
 
   const currentStep = Math.floor((progress / 100) * scanSteps.length);
 
   return (
     <div className="cyber-panel">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-cyber font-bold text-cyber-green">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-cyber font-bold text-cyber-green">
           SCAN PROGRESS
         </h2>
         <div className="flex items-center space-x-2">
@@ -29,14 +29,14 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-cyber-green font-mono">PROGRESS</span>
-          <span className="text-sm text-cyber-green font-mono">{Math.round(progress)}%</span>
+          <span className="text-xs sm:text-sm text-cyber-green font-mono">PROGRESS</span>
+          <span className="text-xs sm:text-sm text-cyber-green font-mono">{Math.round(progress)}%</span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-4 relative overflow-hidden">
+        <div className="w-full bg-gray-700 rounded-full h-3 sm:h-4 relative overflow-hidden">
           <motion.div
-            className="h-4 bg-gradient-to-r from-cyber-blue via-cyber-yellow to-cyber-green rounded-full"
+            className="h-3 sm:h-4 bg-gradient-to-r from-cyber-blue via-cyber-yellow to-cyber-green rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5 }}
@@ -52,7 +52,7 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
       </div>
 
       {/* Scan Steps */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
         {scanSteps.map((step, index) => (
           <motion.div
             key={step.label}
@@ -62,7 +62,7 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
               scale: index <= currentStep ? 1 : 0.8 
             }}
             transition={{ delay: index * 0.2 }}
-            className={`p-3 rounded border ${
+            className={`p-2 sm:p-3 rounded border ${
               index <= currentStep 
                 ? 'border-cyber-green bg-cyber-green/10' 
                 : 'border-gray-600 bg-gray-800/50'
@@ -72,13 +72,13 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
               <div className={index <= currentStep ? step.color : 'text-gray-500'}>
                 {step.icon}
               </div>
-              <div>
-                <div className={`text-xs font-mono ${
+              <div className="min-w-0 flex-1">
+                <div className={`text-xs font-mono truncate ${
                   index <= currentStep ? 'text-cyber-green' : 'text-gray-500'
                 }`}>
                   {step.label}
                 </div>
-                <div className={`text-xs ${
+                <div className={`text-xs truncate ${
                   index <= currentStep ? 'text-cyber-green' : 'text-gray-600'
                 }`}>
                   {index <= currentStep ? 'ACTIVE' : 'PENDING'}
@@ -90,14 +90,14 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
       </div>
 
       {/* Status Indicators */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-center p-3 bg-darker-bg rounded border border-cyber-green/30"
+          className="text-center p-2 sm:p-3 bg-darker-bg rounded border border-cyber-green/30"
         >
-          <div className="text-2xl font-cyber font-bold text-cyber-blue mb-1">
+          <div className="text-lg sm:text-2xl font-cyber font-bold text-cyber-blue mb-1">
             {Math.floor(Math.random() * 1000) + 500}
           </div>
           <div className="text-xs text-gray-400">FILES SCANNED</div>
@@ -107,9 +107,9 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="text-center p-3 bg-darker-bg rounded border border-cyber-green/30"
+          className="text-center p-2 sm:p-3 bg-darker-bg rounded border border-cyber-green/30"
         >
-          <div className="text-2xl font-cyber font-bold text-cyber-yellow mb-1">
+          <div className="text-lg sm:text-2xl font-cyber font-bold text-cyber-yellow mb-1">
             {Math.floor(Math.random() * 5)}
           </div>
           <div className="text-xs text-gray-400">THREATS FOUND</div>
@@ -119,9 +119,9 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="text-center p-3 bg-darker-bg rounded border border-cyber-green/30"
+          className="text-center p-2 sm:p-3 bg-darker-bg rounded border border-cyber-green/30"
         >
-          <div className="text-2xl font-cyber font-bold text-cyber-green mb-1">
+          <div className="text-lg sm:text-2xl font-cyber font-bold text-cyber-green mb-1">
             {Math.floor(Math.random() * 50) + 20}
           </div>
           <div className="text-xs text-gray-400">ISSUES FIXED</div>
@@ -133,9 +133,9 @@ const ScanProgress: React.FC<ScanProgressProps> = ({ progress }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="mt-4 p-3 bg-darker-bg rounded border border-cyber-green/30"
+        className="mt-3 sm:mt-4 p-2 sm:p-3 bg-darker-bg rounded border border-cyber-green/30"
       >
-        <div className="text-sm text-cyber-green font-mono">
+        <div className="text-xs sm:text-sm text-cyber-green font-mono">
           <span className="animate-blink">{'>'}</span> Scanning system files...
         </div>
         <div className="text-xs text-gray-400 mt-1">

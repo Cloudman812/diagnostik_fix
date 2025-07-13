@@ -39,7 +39,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
 
   const monitorItems = [
     {
-      icon: <Cpu className="w-8 h-8" />,
+      icon: <Cpu className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: 'CPU USAGE',
       value: systemStatus.cpu.usage,
       unit: '%',
@@ -47,7 +47,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
       color: 'text-cyber-blue'
     },
     {
-      icon: <MemoryStick className="w-8 h-8" />,
+      icon: <MemoryStick className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: 'MEMORY USAGE',
       value: systemStatus.memory.usage,
       unit: '%',
@@ -55,7 +55,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
       color: 'text-cyber-purple'
     },
     {
-      icon: <HardDrive className="w-8 h-8" />,
+      icon: <HardDrive className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: 'DISK USAGE',
       value: systemStatus.disk.usage,
       unit: '%',
@@ -63,7 +63,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
       color: 'text-cyber-orange'
     },
     {
-      icon: <Activity className="w-8 h-8" />,
+      icon: <Activity className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: 'NETWORK SPEED',
       value: systemStatus.network.speed,
       unit: 'Mbps',
@@ -74,7 +74,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
 
   return (
     <div className="cyber-panel h-full">
-      <h2 className="text-xl font-cyber font-bold text-cyber-green mb-6 text-center">
+      <h2 className="text-lg sm:text-xl font-cyber font-bold text-cyber-green mb-4 sm:mb-6 text-center">
         SYSTEM MONITOR
       </h2>
       
@@ -83,9 +83,9 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-4 p-3 bg-cyber-green/20 rounded border border-cyber-green text-center"
+          className="mb-3 sm:mb-4 p-2 sm:p-3 bg-cyber-green/20 rounded border border-cyber-green text-center"
         >
-          <div className="text-sm font-cyber font-bold text-cyber-green">
+          <div className="text-xs sm:text-sm font-cyber font-bold text-cyber-green">
             ✅ СИСТЕМА ОПТИМИЗИРОВАНА
           </div>
           <div className="text-xs text-gray-300 mt-1">
@@ -94,34 +94,34 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
         </motion.div>
       )}
       
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {monitorItems.map((item, index) => (
           <motion.div
             key={item.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-darker-bg p-4 rounded border border-cyber-green/30"
+            className="bg-darker-bg p-3 sm:p-4 rounded border border-cyber-green/30"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <div className={item.color}>
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                <div className={`${item.color} flex-shrink-0`}>
                   {item.icon}
                 </div>
-                <div>
-                  <div className="font-mono text-sm text-cyber-green">{item.title}</div>
-                  <div className="text-xs text-gray-400">{item.subValue}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-mono text-xs sm:text-sm text-cyber-green truncate">{item.title}</div>
+                  <div className="text-xs text-gray-400 truncate">{item.subValue}</div>
                 </div>
               </div>
-              <div className={`text-2xl font-cyber font-bold ${getUsageColor(item.value)}`}>
+              <div className={`text-lg sm:text-2xl font-cyber font-bold ${getUsageColor(item.value)} flex-shrink-0 ml-2`}>
                 {item.value}{item.unit}
               </div>
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-700 rounded-full h-3 relative overflow-hidden">
+            <div className="w-full bg-gray-700 rounded-full h-2 sm:h-3 relative overflow-hidden">
               <motion.div
-                className={`h-3 rounded-full ${getBarColor(item.value)}`}
+                className={`h-2 sm:h-3 rounded-full ${getBarColor(item.value)}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${item.value}%` }}
                 transition={{ duration: 1, delay: index * 0.1 }}
@@ -146,15 +146,15 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="mt-6 p-4 bg-darker-bg rounded border border-cyber-green/30"
+        className="mt-4 sm:mt-6 p-3 sm:p-4 bg-darker-bg rounded border border-cyber-green/30"
       >
-        <div className="text-center mb-4">
-          <div className="text-lg font-cyber font-bold text-cyber-green">
+        <div className="text-center mb-3 sm:mb-4">
+          <div className="text-sm sm:text-lg font-cyber font-bold text-cyber-green">
             REAL-TIME ACTIVITY
           </div>
         </div>
         
-        <div className="flex items-end justify-between h-20 space-x-1">
+        <div className="flex items-end justify-between h-16 sm:h-20 space-x-0.5 sm:space-x-1">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
@@ -162,7 +162,7 @@ const SystemMonitor: React.FC<SystemMonitorProps> = ({ systemStatus, allProblems
               initial={{ height: 0 }}
               animate={{ height: `${allProblemsFixed ? Math.random() * 40 + 10 : Math.random() * 100}%` }}
               transition={{ duration: 0.5, delay: i * 0.05 }}
-              style={{ width: '4px' }}
+              style={{ width: '3px' }}
             />
           ))}
         </div>

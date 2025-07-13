@@ -7,6 +7,43 @@
     @apply bg-dark-bg text-cyber-green font-mono;
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
     overflow-x: hidden;
+    font-size: 14px; /* Base font size for mobile */
+  }
+  
+  /* Mobile-first responsive typography */
+  @media (min-width: 640px) {
+    body {
+      font-size: 16px;
+    }
+  }
+  
+  /* Ensure text is readable on mobile */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+  }
+  
+  /* Improve touch targets on mobile */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Optimize for mobile screens */
+  @media (max-width: 640px) {
+    .cyber-panel {
+      margin: 0.5rem;
+      padding: 0.75rem;
+    }
+    
+    .cyber-button {
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+    
+    .cyber-button-sm {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+    }
   }
 }
 
@@ -46,6 +83,36 @@
   .glow-border {
     border: 1px solid #00ff41;
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+  }
+  
+  /* Mobile-optimized text classes */
+  .text-mobile-sm {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+  
+  .text-mobile-base {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .text-mobile-lg {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  
+  @media (min-width: 640px) {
+    .text-mobile-sm {
+      font-size: 0.875rem;
+    }
+    
+    .text-mobile-base {
+      font-size: 1rem;
+    }
+    
+    .text-mobile-lg {
+      font-size: 1.125rem;
+    }
   }
 }
 

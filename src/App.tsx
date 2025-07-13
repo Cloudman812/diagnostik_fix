@@ -147,53 +147,53 @@ const App: React.FC = () => {
       {/* Scan line effect */}
       {isScanning && <div className="scan-line" />}
       
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-3 sm:p-6">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-4 sm:mb-8"
         >
           <GlitchText 
             text="COMPUTER MASTER DIAGNOSTICS" 
-            className="text-4xl font-cyber font-bold mb-2"
+            className="text-2xl sm:text-4xl font-cyber font-bold mb-2"
           />
-          <p className="text-cyber-blue text-lg">
+          <p className="text-cyber-blue text-sm sm:text-lg">
             Advanced System Analysis & Security Suite
           </p>
         </motion.div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - System Monitor */}
+        {/* Main Content Grid - Mobile First */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* System Monitor - Full width on mobile, left column on desktop */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-1"
+            className="lg:col-span-1 order-1 lg:order-1"
           >
             <SystemMonitor systemStatus={systemStatus} allProblemsFixed={allProblemsFixed} />
           </motion.div>
 
-          {/* Center Column - Terminal & Scan Progress */}
+          {/* Terminal & Scan Progress - Full width on mobile, center column on desktop */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="lg:col-span-1"
+            className="lg:col-span-1 order-3 lg:order-2"
           >
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <Terminal logs={logs} />
               {isScanning && <ScanProgress progress={scanProgress} />}
             </div>
           </motion.div>
 
-          {/* Right Column - Status Panel */}
+          {/* Status Panel - Full width on mobile, right column on desktop */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}
-            className="lg:col-span-1"
+            className="lg:col-span-1 order-2 lg:order-3"
           >
             <StatusPanel systemStatus={systemStatus} />
           </motion.div>
@@ -204,12 +204,12 @@ const App: React.FC = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="mt-8 text-center"
+          className="mt-6 sm:mt-8 text-center"
         >
           <button
             onClick={startScan}
             disabled={isScanning}
-            className={`cyber-button text-xl px-8 py-4 ${isScanning ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+            className={`cyber-button text-base sm:text-xl px-6 sm:px-8 py-3 sm:py-4 ${isScanning ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
           >
             {isScanning ? 'СКАНИРОВАНИЕ...' : 'ЗАПУСТИТЬ ДИАГНОСТИКУ'}
           </button>

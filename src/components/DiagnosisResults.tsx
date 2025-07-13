@@ -121,11 +121,8 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
     }
   ];
 
-  // Shuffle and select 7 results (70% negative focus)
-  const selectedResults = diagnosticResults
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 7)
-    .sort((a, b) => b.severity - a.severity);
+  // Static list - no shuffling, always show the same 7 problems in the same order
+  const selectedResults = diagnosticResults.slice(0, 7);
 
   const logMessages = [
     'Инициализация модуля диагностики...',
@@ -202,7 +199,8 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
           progress: stepProgress
         }
       }));
-      
+
+      // Wait for step duration
       await new Promise(resolve => setTimeout(resolve, fixSteps[stepIndex].duration));
     }
 
@@ -215,55 +213,38 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
       }
     }));
 
-    // Mark problem as fixed
+    // Add to fixed problems
     setFixedProblems(prev => [...prev, problemId]);
-    
-    // Remove from active fixes
-    setTimeout(() => {
-      setActiveFixes(prev => {
-        const newState = { ...prev };
-        delete newState[problemId];
-        return newState;
-      });
-    }, 2000);
 
     // Check if all problems are fixed
-    const allProblems = selectedResults.length + 1; // +1 for basic problems
-    const totalFixed = fixedProblems.length + 1; // +1 for current fix
+    const allFixed = selectedResults.every(r => 
+      fixedProblems.includes(r.id) || activeFixes[r.id]?.isCompleted
+    );
     
-    if (totalFixed >= allProblems) {
-      setTimeout(() => {
-        setShowSuccessModal(true);
-        onAllProblemsFixed?.(); // Уведомляем о завершении всех исправлений
-      }, 1000);
+    if (allFixed && onAllProblemsFixed) {
+      onAllProblemsFixed();
     }
   };
 
   const handleFixProblem = async (problemId: string) => {
-    if (activeFixes[problemId]) return; // Already fixing this problem
+    if (fixedProblems.includes(problemId) || activeFixes[problemId]) return;
     await startFixProcess(problemId);
   };
 
   const handleFixAllProblems = async () => {
-    const allProblemIds = ['basic', ...selectedResults.map(r => r.id)];
-    const unfixedProblems = allProblemIds.filter(id => 
-      !fixedProblems.includes(id) && !activeFixes[id]
+    const unfixedProblems = selectedResults.filter(r => 
+      !fixedProblems.includes(r.id) && !activeFixes[r.id]
     );
     
-    // Start all unfixed problems simultaneously
-    unfixedProblems.forEach(problemId => {
-      if (problemId === 'basic') {
-        handleFixBasicProblems();
-      } else {
-        startFixProcess(problemId);
-      }
+    unfixedProblems.forEach(problem => {
+      startFixProcess(problem.id);
     });
   };
 
   const handleFixBasicProblems = async () => {
-    if (activeFixes['basic']) return; // Already fixing basic problems
-
-    // Initialize fix state for basic problems
+    if (fixedProblems.includes('basic') || activeFixes['basic']) return;
+    
+    // Initialize basic fix
     setActiveFixes(prev => ({
       ...prev,
       basic: {
@@ -274,44 +255,18 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
       }
     }));
 
-    for (let stepIndex = 0; stepIndex < fixSteps.length; stepIndex++) {
-      // Update current step
+    // Simulate basic system fix
+    for (let i = 0; i <= 100; i += 10) {
+      await new Promise(resolve => setTimeout(resolve, 200));
       setActiveFixes(prev => ({
         ...prev,
         basic: {
           ...prev.basic,
-          currentStep: stepIndex
+          progress: i
         }
       }));
-      
-      // Add logs for current step
-      const stepLogs = logMessages.slice(stepIndex * 3, (stepIndex + 1) * 3);
-      
-      for (let i = 0; i < stepLogs.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setActiveFixes(prev => ({
-          ...prev,
-          basic: {
-            ...prev.basic,
-            logs: [...prev.basic.logs, `[${new Date().toLocaleTimeString()}] ${stepLogs[i]}`]
-          }
-        }));
-      }
-
-      // Update progress
-      const stepProgress = ((stepIndex + 1) / fixSteps.length) * 100;
-      setActiveFixes(prev => ({
-        ...prev,
-        basic: {
-          ...prev.basic,
-          progress: stepProgress
-        }
-      }));
-      
-      await new Promise(resolve => setTimeout(resolve, fixSteps[stepIndex].duration));
     }
 
-    // Mark as completed
     setActiveFixes(prev => ({
       ...prev,
       basic: {
@@ -320,49 +275,29 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
       }
     }));
 
-    // Mark basic problems as fixed
     setFixedProblems(prev => [...prev, 'basic']);
-    
-    // Remove from active fixes
-    setTimeout(() => {
-      setActiveFixes(prev => {
-        const newState = { ...prev };
-        delete newState.basic;
-        return newState;
-      });
-    }, 2000);
-    
-    // Check if all problems are fixed
-    const allProblems = selectedResults.length + 1; // +1 for basic problems
-    const totalFixed = fixedProblems.length + 1; // +1 for current fix
-    
-    if (totalFixed >= allProblems) {
-      setTimeout(() => {
-        setShowSuccessModal(true);
-        onAllProblemsFixed?.(); // Уведомляем о завершении всех исправлений
-      }, 1000);
-    }
   };
 
   const getProblemIcon = (type: string) => {
+    const iconClass = "w-5 h-5 sm:w-6 sm:h-6"; // Responsive icon sizing
     switch (type) {
       case 'critical':
-        return <XCircle className="w-5 h-5 text-cyber-red" />;
+        return <AlertTriangle className={`${iconClass} text-cyber-red`} />;
       case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-cyber-yellow" />;
+        return <AlertTriangle className={`${iconClass} text-cyber-yellow`} />;
       default:
-        return <AlertTriangle className="w-5 h-5 text-cyber-yellow" />;
+        return <AlertTriangle className={`${iconClass} text-cyber-yellow`} />;
     }
   };
 
   const getProblemColor = (type: string) => {
     switch (type) {
       case 'critical':
-        return 'border-cyber-red bg-cyber-red/10';
+        return 'border-cyber-red/50 bg-cyber-red/10';
       case 'warning':
-        return 'border-cyber-yellow bg-cyber-yellow/10';
+        return 'border-cyber-yellow/50 bg-cyber-yellow/10';
       default:
-        return 'border-cyber-yellow bg-cyber-yellow/10';
+        return 'border-cyber-yellow/50 bg-cyber-yellow/10';
     }
   };
 
@@ -388,54 +323,54 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            className="cyber-panel max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="cyber-panel max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-6 border-b border-cyber-green/30 pb-4">
-              <div className="flex items-center space-x-3">
-                <Shield className="w-8 h-8 text-cyber-red" />
-                <h2 className="text-2xl font-cyber font-bold text-cyber-green">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-cyber-green/30 pb-3 sm:pb-4">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-cyber-red" />
+                <h2 className="text-lg sm:text-2xl font-cyber font-bold text-cyber-green">
                   РЕЗУЛЬТАТЫ ДИАГНОСТИКИ
                 </h2>
               </div>
               <button
                 onClick={onClose}
-                className="text-cyber-green hover:text-cyber-red transition-colors"
+                className="text-cyber-green hover:text-cyber-red transition-colors p-1"
               >
-                <XCircle className="w-6 h-6" />
+                <XCircle className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
             {/* Fix All Button */}
             {canFixAll && (
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <motion.button
                   onClick={handleFixAllProblems}
                   disabled={isAnyFixActive}
                   whileHover={!isAnyFixActive ? { scale: 1.02 } : {}}
                   whileTap={!isAnyFixActive ? { scale: 0.98 } : {}}
-                  className="w-full cyber-button text-lg py-4 flex items-center justify-center space-x-3 bg-gradient-to-r from-cyber-purple to-cyber-blue hover:from-cyber-blue hover:to-cyber-purple"
+                  className="w-full cyber-button text-sm sm:text-lg py-3 sm:py-4 flex items-center justify-center space-x-2 sm:space-x-3 bg-gradient-to-r from-cyber-purple to-cyber-blue hover:from-cyber-blue hover:to-cyber-purple"
                 >
-                  <Zap className="w-5 h-5" />
-                  <span>ИСПРАВИТЬ ВСЕ ПРОБЛЕМЫ ОДНОВРЕМЕННО</span>
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-base">ИСПРАВИТЬ ВСЕ ПРОБЛЕМЫ ОДНОВРЕМЕННО</span>
                 </motion.button>
               </div>
             )}
 
             {/* Basic System Fix Button */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <motion.button
                 onClick={handleFixBasicProblems}
                 disabled={fixedProblems.includes('basic') || !!activeFixes['basic']}
                 whileHover={!fixedProblems.includes('basic') && !activeFixes['basic'] ? { scale: 1.02 } : {}}
                 whileTap={!fixedProblems.includes('basic') && !activeFixes['basic'] ? { scale: 0.98 } : {}}
-                className={`w-full cyber-button text-lg py-4 flex items-center justify-center space-x-3 ${
+                className={`w-full cyber-button text-sm sm:text-lg py-3 sm:py-4 flex items-center justify-center space-x-2 sm:space-x-3 ${
                   fixedProblems.includes('basic')
                     ? 'bg-cyber-green/20 border-cyber-green text-cyber-green'
                     : activeFixes['basic']
@@ -445,47 +380,47 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
               >
                 {fixedProblems.includes('basic') ? (
                   <>
-                    <CheckCircle className="w-5 h-5" />
-                    <span>БАЗОВЫЕ ПРОБЛЕМЫ ИСПРАВЛЕНЫ</span>
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-base">БАЗОВЫЕ ПРОБЛЕМЫ ИСПРАВЛЕНЫ</span>
                   </>
                 ) : activeFixes['basic'] ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>ИСПРАВЛЕНИЕ В ПРОЦЕССЕ... {Math.round(activeFixes['basic'].progress)}%</span>
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                    <span className="text-xs sm:text-base">ИСПРАВЛЕНИЕ В ПРОЦЕССЕ... {Math.round(activeFixes['basic'].progress)}%</span>
                   </>
                 ) : (
                   <>
-                    <Wrench className="w-5 h-5" />
-                    <span>ИСПРАВИТЬ БАЗОВЫЕ СИСТЕМНЫЕ ПРОБЛЕМЫ</span>
+                    <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-base">ИСПРАВИТЬ БАЗОВЫЕ СИСТЕМНЫЕ ПРОБЛЕМЫ</span>
                   </>
                 )}
               </motion.button>
             </div>
 
             {/* Individual Problem Fix Buttons - Static List */}
-            <div className="space-y-4">
-              {selectedResults.map((result, index) => (
+            <div className="space-y-3 sm:space-y-4">
+              {selectedResults.map((result) => (
                 <div
                   key={result.id}
-                  className={`p-4 rounded border ${getProblemColor(result.type)}`}
+                  className={`p-3 sm:p-4 rounded border ${getProblemColor(result.type)}`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                       {getProblemIcon(result.type)}
-                      <h3 className={`font-cyber font-bold ${getProblemTitleColor(result.type)}`}>
+                      <h3 className={`font-cyber font-bold text-sm sm:text-base ${getProblemTitleColor(result.type)} truncate`}>
                         {result.title}
                       </h3>
                     </div>
-                    <div className="text-xs text-gray-400 font-mono">
-                      СЕВЕРНОСТЬ: {result.severity}/10
+                    <div className="text-xs text-gray-400 font-mono ml-2 flex-shrink-0">
+                      {result.severity}/10
                     </div>
                   </div>
                   
-                  <div className="text-sm text-gray-300 mb-3 leading-relaxed">
+                  <div className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3 leading-relaxed">
                     {result.description}
                   </div>
                   
-                  <div className="text-xs text-cyber-blue mb-4 font-mono">
+                  <div className="text-xs text-cyber-blue mb-3 sm:mb-4 font-mono">
                     💡 {result.recommendation}
                   </div>
 
@@ -494,7 +429,7 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
                     disabled={fixedProblems.includes(result.id) || !!activeFixes[result.id]}
                     whileHover={!fixedProblems.includes(result.id) && !activeFixes[result.id] ? { scale: 1.02 } : {}}
                     whileTap={!fixedProblems.includes(result.id) && !activeFixes[result.id] ? { scale: 0.98 } : {}}
-                    className={`cyber-button-sm flex items-center space-x-2 ${
+                    className={`cyber-button-sm flex items-center space-x-2 text-xs sm:text-sm ${
                       fixedProblems.includes(result.id)
                         ? 'bg-cyber-green/20 border-cyber-green text-cyber-green'
                         : activeFixes[result.id]
@@ -504,17 +439,17 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
                   >
                     {fixedProblems.includes(result.id) ? (
                       <>
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>ИСПРАВЛЕНО</span>
                       </>
                     ) : activeFixes[result.id] ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                         <span>ИСПРАВЛЕНИЕ... {Math.round(activeFixes[result.id].progress)}%</span>
                       </>
                     ) : (
                       <>
-                        <Zap className="w-4 h-4" />
+                        <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>ИСПРАВИТЬ ПРОБЛЕМУ</span>
                       </>
                     )}
@@ -524,12 +459,12 @@ const DiagnosisResults: React.FC<DiagnosisResultsProps> = ({ isVisible, onClose,
             </div>
 
             {/* Summary */}
-            <div className="mt-6 p-4 bg-darker-bg rounded border border-cyber-green/30">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-darker-bg rounded border border-cyber-green/30">
               <div className="text-center">
-                <div className="text-lg font-cyber font-bold text-cyber-green mb-2">
+                <div className="text-base sm:text-lg font-cyber font-bold text-cyber-green mb-2">
                   СВОДКА ДИАГНОСТИКИ
                 </div>
-                <div className="grid grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div>
                     <div className="text-cyber-red font-bold">{selectedResults.filter(r => r.type === 'critical').length}</div>
                     <div className="text-gray-400">КРИТИЧЕСКИХ</div>
