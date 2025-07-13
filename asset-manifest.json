@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/diagnostik_fix/static/css/main.104ad668.css",
+    "main.js": "/diagnostik_fix/static/js/main.2c237918.js",
+    "index.html": "/diagnostik_fix/index.html",
+    "main.104ad668.css.map": "/diagnostik_fix/static/css/main.104ad668.css.map",
+    "main.2c237918.js.map": "/diagnostik_fix/static/js/main.2c237918.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.104ad668.css",
+    "static/js/main.2c237918.js"
+  ]
+}
