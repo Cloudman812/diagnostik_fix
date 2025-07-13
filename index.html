@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Master Diagnostics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .glitch-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 0 0 10px #00ff41; }
+            50% { text-shadow: 2px 0 10px #ff0040, -2px 0 10px #00d4ff; }
+        }
+
+        .subtitle {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff41;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #0a0a0a;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            border-color: rgba(0, 255, 65, 0.6);
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: #00ff41;
+        }
+
+        .status-value {
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            color: #00ff41;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00d4ff);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: white;
+            opacity: 0.7;
+            animation: scan 2s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: 0; }
+            100% { left: 100%; }
+        }
+
+        .terminal {
+            background: #000;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 4px;
+            padding: 1rem;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.25rem;
+            color: #00ff41;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .scan-button {
+            background: transparent;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .scan-button:hover {
+            background: #00ff41;
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        .scan-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            animation: scanLine 3s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes scanLine {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff41;
+            border-radius: 50%;
+            animation: particleFloat 4s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff41;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .results-panel {
+            background: #1a1a1a;
+            border: 1px solid #ff0040;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.2);
+        }
+
+        .results-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .result-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #0a0a0a;
+            border-left: 3px solid #ff0040;
+            border-radius: 4px;
+        }
+
+        .result-item.warning {
+            border-left-color: #ffd700;
+        }
+
+        .result-item.critical {
+            border-left-color: #ff0040;
+            background: rgba(255, 0, 64, 0.1);
+        }
+
+        .result-title {
+            font-weight: bold;
+            color: #ff0040;
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .result-title.warning {
+            color: #ffd700;
+        }
+
+        .result-description {
+            color: #ccc;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-recommendation {
+            color: #00ff41;
+            font-style: italic;
+            font-size: 0.8rem;
+        }
+
+        .critical-text {
+            color: #ff0040;
+            font-weight: bold;
+        }
+
+        .warning-text {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #0a0a0a;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 4px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff41;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .glitch-title {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix-bg" id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="glitch-title">COMPUTER MASTER DIAGNOSTICS</h1>
+            <p class="subtitle">Advanced System Analysis & Security Suite</p>
+        </div>
+
+        <div class="grid">
+            <!-- System Monitor -->
+            <div class="panel">
+                <h2 class="panel-title">SYSTEM MONITOR</h2>
+                <div class="status-item">
+                    <span class="status-label">CPU USAGE</span>
+                    <span class="status-value" id="cpuUsage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cpuProgress" style="width: 0%"></div>
+                </div>
+                
+                <div class="status-item">
+                    <span class="status-label">MEMORY USAGE</span>
+                    <span class="status-value" id="memoryUsage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="memoryProgress" style="width: 0%"></div>
+                </div>
+                
+                <div class="status-item">
+                    <span class="status-label">DISK USAGE</span>
+                    <span class="status-value" id="diskUsage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="diskProgress" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Terminal -->
+            <div class="panel">
+                <h2 class="panel-title">SYSTEM LOGS</h2>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-line">$ Waiting for system logs...<span class="terminal-cursor">_</span></div>
+                </div>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="panel">
+                <h2 class="panel-title">SYSTEM STATUS</h2>
+                <div class="status-item">
+                    <span class="status-label">CPU</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="status-value" id="cpuStatus">NORMAL</span>
+                        <div class="status-light"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">MEMORY</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="status-value" id="memoryStatus">NORMAL</span>
+                        <div class="status-light"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">SECURITY</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="status-value" id="securityStatus">SECURE</span>
+                        <div class="status-light"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="filesScanned">0</div>
+                        <div class="stat-label">FILES SCANNED</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="threatsFound">0</div>
+                        <div class="stat-label">THREATS FOUND</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="issuesFixed">0</div>
+                        <div class="stat-label">ISSUES FIXED</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="scan-button" id="scanButton" onclick="startScan()">
+            ЗАПУСТИТЬ ДИАГНОСТИКУ
+        </button>
+        
+        <!-- Results Panel -->
+        <div class="panel results-panel" id="resultsPanel" style="display: none; margin-top: 2rem;">
+            <h2 class="panel-title">РЕЗУЛЬТАТЫ ДИАГНОСТИКИ</h2>
+            <div class="results-content" id="resultsContent">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix background
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+        const matrixArray = matrix.split("");
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 35);
+        
+        // Particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 4 + 's';
+            document.getElementById('particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 4000);
+        }
+        
+        setInterval(createParticle, 100);
+        
+        // System monitoring
+        function updateSystemStats() {
+            const cpuUsage = Math.floor(Math.random() * 100);
+            const memoryUsage = 40 + Math.floor(Math.random() * 40);
+            const diskUsage = 60 + Math.floor(Math.random() * 30);
+            
+            document.getElementById('cpuUsage').textContent = cpuUsage + '%';
+            document.getElementById('memoryUsage').textContent = memoryUsage + '%';
+            document.getElementById('diskUsage').textContent = diskUsage + '%';
+            
+            document.getElementById('cpuProgress').style.width = cpuUsage + '%';
+            document.getElementById('memoryProgress').style.width = memoryUsage + '%';
+            document.getElementById('diskProgress').style.width = diskUsage + '%';
+            
+            // Update stats
+            document.getElementById('filesScanned').textContent = Math.floor(Math.random() * 1000) + 500;
+            document.getElementById('threatsFound').textContent = Math.floor(Math.random() * 5);
+            document.getElementById('issuesFixed').textContent = Math.floor(Math.random() * 50) + 20;
+        }
+        
+        setInterval(updateSystemStats, 2000);
+        
+        // Scan functionality
+        let isScanning = false;
+        const scanSteps = [
+            'Инициализация системы диагностики...',
+            'Проверка целостности файловой системы...',
+            'Сканирование реестра Windows...',
+            'Анализ процессов и служб...',
+            'Проверка сетевых соединений...',
+            'Сканирование на наличие вредоносного ПО...',
+            'Анализ производительности системы...',
+            'Проверка обновлений безопасности...',
+            'Формирование отчета...',
+            'Диагностика завершена!'
+        ];
+
+        const diagnosticResults = [
+            {
+                title: 'КРИТИЧЕСКАЯ УГРОЗА БЕЗОПАСНОСТИ',
+                description: 'Обнаружено <span class="critical-text">3 активных вредоносных процесса</span> в системе. Файл "svchost32.exe" в папке %TEMP% является троянским конем типа <span class="critical-text">Backdoor.Win32.Generic</span>.',
+                recommendation: 'НЕМЕДЛЕННО: Запустить полное сканирование антивирусом и удалить подозрительные файлы.',
+                type: 'critical'
+            },
+            {
+                title: 'ПЕРЕГРЕВ ПРОЦЕССОРА',
+                description: 'Температура CPU достигает <span class="critical-text">89°C</span> при нагрузке, что значительно превышает безопасные пределы. <span class="critical-text">Риск термического повреждения компонентов.</span>',
+                recommendation: 'Проверить систему охлаждения, очистить от пыли, заменить термопасту.',
+                type: 'critical'
+            },
+            {
+                title: 'КРИТИЧЕСКИЙ УРОВЕНЬ ИСПОЛЬЗОВАНИЯ ПАМЯТИ',
+                description: 'RAM используется на <span class="critical-text">94%</span>, что вызывает сильные лаги и зависания. <span class="critical-text">Система работает на пределе возможностей.</span>',
+                recommendation: 'Закрыть ненужные программы, увеличить объем RAM до 16GB.',
+                type: 'critical'
+            },
+            {
+                title: 'ПОВРЕЖДЕНИЕ ФАЙЛОВОЙ СИСТЕМЫ',
+                description: 'Найдено <span class="critical-text">127 поврежденных секторов</span> на диске C:. <span class="critical-text">Риск потери данных и полного отказа диска.</span>',
+                recommendation: 'Выполнить chkdsk /f, создать резервные копии важных данных.',
+                type: 'critical'
+            },
+            {
+                title: 'УСТАРЕВШИЕ ДРАЙВЕРЫ',
+                description: '<span class="warning-text">23 драйвера</span> не обновлялись более 2 лет. <span class="warning-text">Видеокарта работает на 60% от возможной производительности.</span>',
+                recommendation: 'Обновить драйверы через Device Manager или сайт производителя.',
+                type: 'warning'
+            },
+            {
+                title: 'ПРОБЛЕМЫ С СЕТЬЮ',
+                description: 'Скорость интернета снижена на <span class="warning-text">40%</span> из-за конфликта DNS. <span class="warning-text">Нестабильное соединение.</span>',
+                recommendation: 'Сменить DNS на 8.8.8.8/8.8.4.4, перезагрузить роутер.',
+                type: 'warning'
+            },
+            {
+                title: 'ЗАСОРЕННАЯ СИСТЕМА',
+                description: '<span class="warning-text">15.7 GB</span> временных файлов, <span class="warning-text">47 устаревших записей</span> в реестре. Система загружается медленно.',
+                recommendation: 'Запустить очистку диска, использовать CCleaner для реестра.',
+                type: 'warning'
+            },
+            {
+                title: 'ОТСУТСТВИЕ АНТИВИРУСНОЙ ЗАЩИТЫ',
+                description: 'Антивирус <span class="critical-text">не активен</span> более 30 дней. <span class="critical-text">Система полностью уязвима для атак.</span>',
+                recommendation: 'Активировать антивирус, обновить базы данных.',
+                type: 'critical'
+            },
+            {
+                title: 'ПРОБЛЕМЫ С ЭЛЕКТРОПИТАНИЕМ',
+                description: 'Блок питания работает на <span class="warning-text">нестабильном напряжении</span>. <span class="warning-text">Риск повреждения компонентов.</span>',
+                recommendation: 'Проверить блок питания, заменить при необходимости.',
+                type: 'warning'
+            },
+            {
+                title: 'ПЕРЕГРУЗКА СИСТЕМЫ',
+                description: '<span class="critical-text">89 процессов</span> запущено одновременно. <span class="critical-text">Система работает неэффективно.</span>',
+                recommendation: 'Отключить автозапуск ненужных программ, оптимизировать систему.',
+                type: 'critical'
+            }
+        ];
+        
+        function startScan() {
+            if (isScanning) return;
+            
+            isScanning = true;
+            const button = document.getElementById('scanButton');
+            const terminal = document.getElementById('terminal');
+            const resultsPanel = document.getElementById('resultsPanel');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            button.textContent = 'СКАНИРОВАНИЕ...';
+            button.disabled = true;
+            
+            // Clear previous results
+            resultsContent.innerHTML = '';
+            resultsPanel.style.display = 'none';
+            
+            // Add scan line
+            const scanLine = document.createElement('div');
+            scanLine.className = 'scan-line';
+            document.body.appendChild(scanLine);
+            
+            let currentStep = 0;
+            const scanInterval = setInterval(() => {
+                if (currentStep < scanSteps.length) {
+                    const time = new Date().toLocaleTimeString();
+                    const logLine = document.createElement('div');
+                    logLine.className = 'terminal-line';
+                    logLine.textContent = `[${time}] ${scanSteps[currentStep]}`;
+                    terminal.appendChild(logLine);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    currentStep++;
+                } else {
+                    clearInterval(scanInterval);
+                    isScanning = false;
+                    button.textContent = 'ЗАПУСТИТЬ ДИАГНОСТИКУ';
+                    button.disabled = false;
+                    scanLine.remove();
+                    
+                    // Show results
+                    showResults();
+                }
+            }, 1500);
+        }
+        
+        function showResults() {
+            const resultsPanel = document.getElementById('resultsPanel');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            // Shuffle results for variety
+            const shuffledResults = [...diagnosticResults].sort(() => Math.random() - 0.5);
+            
+            // Show 7 results (70% negative focus)
+            const selectedResults = shuffledResults.slice(0, 7);
+            
+            selectedResults.forEach((result, index) => {
+                setTimeout(() => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = `result-item ${result.type}`;
+                    resultItem.innerHTML = `
+                        <div class="result-title ${result.type === 'warning' ? 'warning' : ''}">${result.title}</div>
+                        <div class="result-description">${result.description}</div>
+                        <div class="result-recommendation">💡 ${result.recommendation}</div>
+                    `;
+                    resultsContent.appendChild(resultItem);
+                    
+                    // Animate in
+                    resultItem.style.opacity = '0';
+                    resultItem.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        resultItem.style.transition = 'all 0.5s ease';
+                        resultItem.style.opacity = '1';
+                        resultItem.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 300);
+            });
+            
+            // Show panel with animation
+            resultsPanel.style.display = 'block';
+            resultsPanel.style.opacity = '0';
+            resultsPanel.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                resultsPanel.style.transition = 'all 0.5s ease';
+                resultsPanel.style.opacity = '1';
+                resultsPanel.style.transform = 'translateY(0)';
+            }, 100);
+        }
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html> 

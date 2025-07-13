@@ -1,13 +1,98 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-cyber-green font-mono;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    overflow-x: hidden;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .cyber-panel {
+    @apply bg-panel-bg border border-cyber-green rounded-lg p-4;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+  }
+  
+  .cyber-button {
+    @apply bg-transparent border border-cyber-green text-cyber-green px-4 py-2 rounded hover:bg-cyber-green hover:text-black transition-all duration-300;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+  }
+  
+  .cyber-button-sm {
+    @apply bg-transparent border border-cyber-green text-cyber-green px-3 py-1.5 rounded text-sm hover:bg-cyber-green hover:text-black transition-all duration-300;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+  }
+  
+  .status-light {
+    @apply w-3 h-3 rounded-full animate-pulse;
+  }
+  
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff41, transparent);
+    animation: scan 3s linear infinite;
+  }
+  
+  .terminal-text {
+    @apply text-cyber-green font-mono;
+    text-shadow: 0 0 5px #00ff41;
+  }
+  
+  .glow-border {
+    border: 1px solid #00ff41;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+  }
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00cc33;
+}
+
+/* Matrix rain effect */
+.matrix-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+.matrix-char {
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  animation: matrix-fall 3s linear infinite;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-100vh);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+} 

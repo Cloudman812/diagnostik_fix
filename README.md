@@ -1,46 +1,81 @@
-# Getting Started with Create React App
+# Computer Master Diagnostics
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Крутейший демонстрационный сайт системы диагностики компьютера с мощной визуальной составляющей в стиле киберпанк.
 
-## Available Scripts
+## Особенности
 
-In the project directory, you can run:
+- 🎨 Современный киберпанк-дизайн с анимациями
+- 📊 Реальные мониторы системы (CPU, RAM, диск, сеть)
+- 🔍 Интерактивное сканирование с прогресс-баром
+- 📝 Живой терминал с логами
+- 🌟 Матричный фон и световые эффекты
+- ⚡ Анимированные индикаторы состояния
+- 🎯 Статус-панель с детальной информацией
 
-### `npm start`
+## Технологии
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- React 18 + TypeScript
+- Framer Motion для анимаций
+- Tailwind CSS для стилизации
+- Lucide React для иконок
+- Canvas API для матричного эффекта
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Установка и запуск
 
-### `npm test`
+```bash
+# Установка зависимостей
+npm install
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Запуск в режиме разработки
+npm start
 
-### `npm run build`
+# Сборка для продакшена
+npm run build
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Структура проекта
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+src/
+├── components/
+│   ├── MatrixBackground.tsx    # Матричный фон
+│   ├── StatusPanel.tsx         # Панель статуса
+│   ├── SystemMonitor.tsx       # Мониторинг системы
+│   ├── Terminal.tsx            # Терминал с логами
+│   └── ScanProgress.tsx        # Прогресс сканирования
+├── App.tsx                     # Главный компонент
+├── index.tsx                   # Точка входа
+└── index.css                   # Стили
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Функциональность
 
-### `npm run eject`
+### Системный мониторинг
+- Отслеживание загрузки CPU в реальном времени
+- Мониторинг использования памяти
+- Анализ свободного места на диске
+- Контроль сетевой активности
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Диагностическое сканирование
+- Поэтапное сканирование системы
+- Анимированный прогресс-бар
+- Детальные логи процесса
+- Статистика найденных угроз
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Визуальные эффекты
+- Матричный дождь на фоне
+- Светящиеся границы и индикаторы
+- Анимированные полосы прогресса
+- Пульсирующие статус-лампочки
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Будущие возможности
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Интеграция с реальными системными API
+- Расширенная диагностика оборудования
+- Автоматическое исправление проблем
+- Детальные отчеты и рекомендации
+- Многоязычная поддержка
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Computer Master Diagnostics** - демонстрация возможностей современного ПО для диагностики компьютеров с впечатляющим пользовательским интерфейсом. 
