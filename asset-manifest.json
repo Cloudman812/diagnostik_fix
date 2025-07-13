@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/diagnostik_fix/static/css/main.a67a7866.css",
-    "main.js": "/diagnostik_fix/static/js/main.31e6d2b1.js",
+    "main.css": "/diagnostik_fix/static/css/main.a463c8f1.css",
+    "main.js": "/diagnostik_fix/static/js/main.3404d5ab.js",
     "index.html": "/diagnostik_fix/index.html",
-    "main.a67a7866.css.map": "/diagnostik_fix/static/css/main.a67a7866.css.map",
-    "main.31e6d2b1.js.map": "/diagnostik_fix/static/js/main.31e6d2b1.js.map"
+    "main.a463c8f1.css.map": "/diagnostik_fix/static/css/main.a463c8f1.css.map",
+    "main.3404d5ab.js.map": "/diagnostik_fix/static/js/main.3404d5ab.js.map"
   },
   "entrypoints": [
-    "static/css/main.a67a7866.css",
-    "static/js/main.31e6d2b1.js"
+    "static/css/main.a463c8f1.css",
+    "static/js/main.3404d5ab.js"
   ]
 }
